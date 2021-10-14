@@ -38,7 +38,7 @@ client.on('message', (channel, userstate, message, self) =>{
             client.say(channel, `${userstate['username']} voted to increase the gummy count.`);
          }
          if (commandName === '!laugh'){
-            client.say(channel, `${userstate['username']} voted to increase the gummy count.`);
+            client.say(channel, `${userstate['username']} voted to increase the laugh count.`);
          }
          break;
       }
