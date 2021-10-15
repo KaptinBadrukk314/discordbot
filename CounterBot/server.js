@@ -22,12 +22,12 @@ client.on('message', (channel, userstate, message, self) =>{
    switch(userstate['mod']) {
       case true:{
          if (commandName === '!gummy'){
-            client.say(channel,`${userstate['username']}Updated the gummy count.`);
+            client.say(channel,`${userstate['username']} Updated the gummy count.`);
             let count = gummy();
             console.log(`Gummy incremented to ${count}`);
          }
          if (commandName === '!laugh'){
-            client.say(channel, `${userstate['username']}Updated the laugh count.`);
+            client.say(channel, `${userstate['username']} Updated the laugh count.`);
             let count = laugh();
             console.log(`Gummy incremented to ${count}`);
          }
