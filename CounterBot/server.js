@@ -11,6 +11,7 @@ const opts = {
       process.env.CHANNELS
    ]
 }
+
 let gummy_count = 0;
 let laugh_count = 0;
 const client = new tmi.client(opts);
@@ -29,7 +30,7 @@ client.on('message', (channel, userstate, message, self) =>{
          if (commandName === '!laugh'){
             client.say(channel, `${userstate['username']} Updated the laugh count.`);
             let count = laugh();
-            console.log(`Gummy incremented to ${count}`);
+            console.log(`Laugh incremented to ${count}`);
          }
          break;
       }
