@@ -152,28 +152,13 @@ client.on('message', (channel, userstate, message, self) =>{
 
    const commandName = message.trim();
 
-   if (commandName === '!NoContextHP'){
+   if (commandName === '!NoContextHP' || commandName === '!nocontexthp' || commandName === '!nchp' || commandName === '!NCHP'){
       client.say(channel, `${userstate['username']}\'s Harry Potter Quote: ${generateHPQuote()}`);
    }
-   if (commandName === '!nocontexthp'){
-      client.say(channel, `${userstate['username']}\'s Harry Potter Quote: ${generateHPQuote()}`);
-   }
-   if (commandName === '!nchp'){
-      client.say(channel, `${userstate['username']}\'s Harry Potter Quote: ${generateHPQuote()}`);
-   }
-   if (commandName === '!NCHP'){
-      client.say(channel, `${userstate['username']}\'s Harry Potter Quote: ${generateHPQuote()}`);
-   }
-   if (commandName === '!SW'){
+   if (commandName === '!SW' || commandName === '!sw'){
       client.say(channel, `${userstate['username']}\'s Star Wars Quote: ${generateSWQuote()}`)
    }
-   if (commandName === '!sw'){
-      client.say(channel, `${userstate['username']}\'s Star Wars Quote: ${generateSWQuote()}`)
-   }
-   if (commandName === '!NCSW'){
-      client.say(channel, `${userstate['username']}\'s Star Wars Quote: ${generateNCSWQuote()}`)
-   }
-   if (commandName === '!ncsw'){
+   if (commandName === '!NCSW' || commandName === '!ncsw'){
       client.say(channel, `${userstate['username']}\'s Star Wars Quote: ${generateNCSWQuote()}`)
    }
 });
