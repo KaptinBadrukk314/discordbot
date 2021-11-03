@@ -5,6 +5,9 @@ const { Client, Collection, Intents } = require('discord.js');
 const { token } = require('./config.json');
 const wait = require('util').promisify(setTimeout);
 const { Sequelize, DataTypes, Op } = require('sequelize');
+//const perm = require('./permission.js');
+
+const guildId = process.env.GUILD_ID;
 
 const db = new Sequelize({
    dialect: 'sqlite',
@@ -79,30 +82,15 @@ const Vote = db.define('Vote', {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
       primaryKey: true
-   },
-   userId:{
-      type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false,
-      references: {
-         model: User,
-         key: 'id'
-      }
-   },
-   punishmentId:{
-      type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false,
-      references: {
-         model: Punishment,
-         key: 'id'
-      }
    }
 });
 
+Vote.belongsTo(User);
+Vote.belongsTo(Punishment);
+
 //sync database
 (async () =>{
-   await db.sync({});
+   await db.sync();
 })();
 
 const clientDiscord = new Client({ intents: [Intents.FLAGS.GUILDS] });
@@ -122,6 +110,7 @@ for (const file of commandFiles) {
 	clientDiscord.commands.set(command.data.name, command);
 }
 
+
 //load events for discord
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
@@ -132,40 +121,8 @@ for (const file of eventFiles) {
 	}
 }
 
-//preload current punishments
-var punishments = Punishment.findAll({
-   where:{
-      voteCount:{
-         [Op.gte]: User.findAll({
-            attributes: {
-             include: [
-               [db.fn('COUNT', db.col('id')), 'n_ids']
-             ]
-           }
-         })
-      }
-   },
-   attributes: {
-    include: [
-      [db.fn('COUNT', db.col('id')), 'n_ids']
-    ]
-}
-});
-
-//preload current users signed up for punishments
-var users = User.findAll();
-
 clientDiscord.on('interactionCreate', async interaction =>{
    if (!interaction.isCommand()) return;
-
-   // if (interaction.isSelectMenu()){
-   //    if (interaction.customId === 'selectVote'){
-   //       //determine what interaction holds
-   //       await interaction.deferUpdate();
-   //       console.log(interaction.values);
-   //       interaction.channel.send({content:'Your selections have been submitted.', ephemeral: true, components: []});
-   //    }
-   // }
 
 	const command = clientDiscord.commands.get(interaction.commandName);
 
@@ -198,9 +155,8 @@ clientTwitch.on('message', async (channel, userstate, message, self) =>{
       }
    }
    if (commandName.startsWith('!spin') || commandName.startsWith('!punish')){
-      var punishment = punishments[Math.floor(Math.random() * punishments.length)];
-      var user = users[Math.floor(Math.random() * users.length)];
-      clientTwitch.say(channel, `${user} has to endure ${punishment}`);
+      //// TODO: Update to use new db
+      //clientTwitch.say(channel, `${user} has to endure ${punishment}`);
    }
    if (commandName.startsWith('!punish agree')){
       var temp = User.findOne({
@@ -210,13 +166,16 @@ clientTwitch.on('message', async (channel, userstate, message, self) =>{
             }
          }
       });
+      //// TODO: no whisper allowed.
+      // FIXME: redirect to discord for signup to use punishment
       switch(userstate["message-type"]) {
            case "chat":
                if(temp.twitchUsername && temp.discordUsername){
                   clientTwitch.say(channel, `${userstate['username']}, you are all set with the punishment wheel.`);
                }else{
+                  var newUser = {};
                   if(!temp.twitchUsername){
-                     const newUser = User.build({
+                     newUser = User.build({
                         twitchUsername: userstate['username']
                      })
                   }
