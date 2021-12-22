@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { Sequelize, DataTypes, Op } = require('sequelize');
-const { MessageActionRow, MessageSelectMenu, Permissions } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, Permissions, MessageEmbed } = require('discord.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,8 +28,13 @@ module.exports = {
                   .setRequired(true)))
       .addSubcommand( subcommand=>
          subcommand
+            .setName('view')
+            .setDescription('View current punishments.'))
+      .addSubcommand( subcommand=>
+         subcommand
             .setName('vote')
-            .setDescription('Select the punishments you would like to see on the wheel')),
+            .setDescription('Select the punishments you would like to see on the wheel'))
+      ,
    async execute(interaction, Vote, User, Punishment) {
       if (interaction.options.getSubcommand() === 'agree'){
          let temp = await User.findOne({
@@ -63,7 +68,20 @@ module.exports = {
          }
          await temp.save();
          await interaction.reply({content:'Your punishment has been added. For it to become active, other users must vote on your punishment to activate it.', ephemeral: true})
-      } else if(interaction.options.getSubcommand() === 'vote'){
+      } else if(interaction.options.getSubcommand() === 'view'){
+         const temp = await Punishment.findAll();
+         let punishments = "Name---Description---Vote Count---Active\n";
+         temp.forEach((item) => {
+            const temp2 = `${item.name}---${item.description}---${item.voteCount}---${item.activeFlg}\n`
+            punishments = punishments.concat(temp2);
+         });
+         let embed = new MessageEmbed()
+            .setColor('#0099ff')
+            .setDescription('List of submitted punishments.')
+            .setTitle('Punishment List')
+            .addField('Punishments', punishments);
+         await interaction.reply({embeds: [embed]});
+      }else if(interaction.options.getSubcommand() === 'vote'){
          const temp = await Punishment.findAll();
          console.log(temp);
          if(temp.length > 0){
@@ -106,6 +124,15 @@ module.exports = {
                   try {
                      await collected.deferUpdate();
                      let newVote = await Vote.build({userId: userVoteId.id, punishmentId: item});
+                     let punishId = await Punishment.findOne({
+                        where: {
+                           id:{
+                              [Op.eq]: item
+                           }
+                        }
+                     });
+                     punishId.voteCount += 1;
+                     await punishId.save();
                      await newVote.save();
                   } catch(err){
                      console.log(err);

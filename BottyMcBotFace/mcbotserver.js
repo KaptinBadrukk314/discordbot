@@ -33,6 +33,20 @@ try {
 }
 
 //create or alter db tables
+const Topic = db.define('Topic', {
+   id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull: false,
+      primaryKey: true
+   },
+   name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true
+   }
+});
+
 const Punishment = db.define('Punishment', {
    id: {
       type: DataTypes.UUID,
@@ -53,6 +67,11 @@ const Punishment = db.define('Punishment', {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
+   },
+   activeFlg:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
    }
 });
 
@@ -129,7 +148,11 @@ clientDiscord.on('interactionCreate', async interaction =>{
 	if (!command) return;
 
 	try {
-		await command.execute(interaction, Vote, User, Punishment);
+      if(interaction.commandName === 'punish'){
+         await command.execute(interaction, Vote, User, Punishment);
+      } else {
+         await command.execute(interaction);
+      }
 	} catch (error) {
 		console.error(error);
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
