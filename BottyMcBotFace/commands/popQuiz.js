@@ -23,7 +23,7 @@ module.exports = {
          const questions;
          if(topic){
             //get questions from specified topic
-            quizObj.topics.get(topic)
+            questions = quizObj.topics.`${topic}`
          } else {
             //get questions from random topic
          }

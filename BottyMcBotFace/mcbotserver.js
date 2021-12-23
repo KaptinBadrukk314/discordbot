@@ -33,20 +33,6 @@ try {
 }
 
 //create or alter db tables
-const Topic = db.define('Topic', {
-   id: {
-      type: DataTypes.UUID,
-      defaultValue: Sequelize.UUIDV4,
-      allowNull: false,
-      primaryKey: true
-   },
-   name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true
-   }
-});
-
 const Punishment = db.define('Punishment', {
    id: {
       type: DataTypes.UUID,
@@ -168,9 +154,9 @@ clientTwitch.on('message', async (channel, userstate, message, self) =>{
       let arr = message.trim().split(" ");
       let user = arr.filter(trickHelper);
       let num = Math.floor(Math.random() * 2);
-      console.log(user);
-      console.log(arr);
-      console.log(num);
+      //console.log(user);
+      //console.log(arr);
+      //console.log(num);
       if (num == 1){//treat
          clientTwitch.say(channel, `${userstate['username']} gave a treat to ${user}`);
       }else{

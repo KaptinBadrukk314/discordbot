@@ -34,6 +34,10 @@ module.exports = {
          subcommand
             .setName('vote')
             .setDescription('Select the punishments you would like to see on the wheel'))
+      .addSubcommand( subcommand=>
+         subcommand
+            .setName('withdraw'))
+            .setDescription('Withdraw from the Punishment Wheel')
       ,
    async execute(interaction, Vote, User, Punishment) {
       if (interaction.options.getSubcommand() === 'agree'){
@@ -83,7 +87,7 @@ module.exports = {
          await interaction.reply({embeds: [embed]});
       }else if(interaction.options.getSubcommand() === 'vote'){
          const temp = await Punishment.findAll();
-         console.log(temp);
+         //console.log(temp);
          if(temp.length > 0){
             let punishments = [];
             temp.forEach((item) => {
@@ -144,6 +148,17 @@ module.exports = {
          } else {
             await interaction.reply({content:'There is nothing to vote for.', ephemeral: true})
          }
+      }else if(interaction.options.getSubcommand() === 'withdraw'){
+         let userRemove = await User.findOne({
+            where:{
+               discordUsername:{
+                  [Op.eq]: collected.user.username
+               }
+            }
+         });
+         userRemove.destroy();
+         userRemove.save();
+         await interaction.reply({content: 'You have withdrawn from the punishment wheel.', ephemeral: true})
       }
    },
 };
